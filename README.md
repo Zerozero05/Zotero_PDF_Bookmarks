@@ -4,24 +4,33 @@
 
 同时适配 Zotero 附件：直接处理 Zotero 当前使用的 PDF 原文件，无需重新附加 PDF。具体操作见下方“在 Zotero 中使用”。
 
-当前正式发行版：**v1.5.0**。面向 Windows 10/11 x64，中文界面，兼容中文文件名和书签。源码、版本历史和文档在本仓库管理；Windows 程序从 Releases 下载。
+当前正式发行版：**v1.5.1**。面向 Windows 10/11 x64，中文界面，兼容中文文件名和书签。源码、版本历史和文档在本仓库管理；Windows 程序从 Releases 下载。
 
-[下载 v1.5.0 Windows 版](https://github.com/Zerozero05/PDF_Bookmarks/releases/tag/v1.5.0) · [完整使用说明](docs/USAGE.md) · [版本记录](CHANGELOG.md) · [维护与清理流程](docs/MAINTENANCE.md) · [自动构建](https://github.com/Zerozero05/PDF_Bookmarks/actions/workflows/windows-build.yml)
+[下载 v1.5.1 Windows 版](https://github.com/Zerozero05/PDF_Bookmarks/releases/tag/v1.5.1) · [完整使用说明](docs/USAGE.md) · [版本记录](CHANGELOG.md) · [维护与清理流程](docs/MAINTENANCE.md) · [自动构建](https://github.com/Zerozero05/PDF_Bookmarks/actions/workflows/windows-build.yml)
 
 ## 选择下载方式
 
 | 下载 | 运行方式与区别 |
 | --- | --- |
-| [单文件 GUI EXE](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.0/PDF_Bookmarks_v1.5.0_win_x64.exe) | 直接运行，携带方便；每次启动需要将运行库解包到临时目录 |
-| [便携文件夹版 ZIP](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.0/PDF_Bookmarks_v1.5.0_win_x64_portable.zip) | 解压后打开 `PDF_Bookmarks\PDF_Bookmarks.exe`；须保留同目录的 `_internal`、`package-manifest.json` 和其余文件，省去启动时的临时解包 |
-| [CLI EXE](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.0/PDF_Bookmarks_v1.5.0_win_x64_cli.exe) | 命令行程序，适合脚本和批量处理；参数见 [使用说明](docs/USAGE.md) |
-| [完整 Windows ZIP](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.0/PDF_Bookmarks_v1.5.0_win_x64_full.zip) | GUI/CLI 单文件 EXE、源码、测试、示例和说明；GUI 位于 `PDF_Bookmarks\dist\PDF_Bookmarks.exe` |
+| [单文件 GUI EXE](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.1/PDF_Bookmarks_v1.5.1_win_x64.exe) | 直接运行，携带方便；每次启动需要将运行库解包到临时目录 |
+| [便携文件夹版 ZIP](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.1/PDF_Bookmarks_v1.5.1_win_x64_portable.zip) | 解压后打开 `PDF_Bookmarks\PDF_Bookmarks.exe`；须保留同目录的 `_internal`、`package-manifest.json` 和其余文件，省去启动时的临时解包 |
+| [CLI EXE](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.1/PDF_Bookmarks_v1.5.1_win_x64_cli.exe) | 命令行程序，适合脚本和批量处理；参数见 [使用说明](docs/USAGE.md) |
+| [完整 Windows ZIP](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.1/PDF_Bookmarks_v1.5.1_win_x64_full.zip) | GUI/CLI 单文件 EXE、源码、测试、示例和说明；GUI 位于 `PDF_Bookmarks\dist\PDF_Bookmarks.exe` |
 
-两种 GUI 都面向 Windows 10/11 x64，无需安装 Python，功能和版本均为 v1.5.0。便携版主要减少启动解包，不承诺每页 OCR 或 PDF 写入更快。两者共用 `%LOCALAPPDATA%\ZoteroPDFBookmarks\settings.json`，切换时继续沿用设置；“便携”指免安装，设置仍保存在当前电脑。
+两种 GUI 都面向 Windows 10/11 x64，无需安装 Python，功能和版本均为 v1.5.1。便携版主要减少启动解包，不承诺每页 OCR 或 PDF 写入更快。两者共用 `%LOCALAPPDATA%\ZoteroPDFBookmarks\settings.json`，切换时继续沿用设置；“便携”指免安装，设置仍保存在当前电脑。
 
-发布页下载文件统一采用 `PDF_Bookmarks_<版本>_<系统>_<架构>[_类型].<扩展名>`，各部分用下划线分隔。下载文件的校验值见 [SHA256SUMS.txt](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.0/SHA256SUMS.txt)，便携 ZIP 另附 [同名 .zip.sha256 文件](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.0/PDF_Bookmarks_v1.5.0_win_x64_portable.zip.sha256)。`update-manifest.json` 供程序检查更新使用，无需手动运行。
+发布页下载文件统一采用 `PDF_Bookmarks_<版本>_<系统>_<架构>[_类型].<扩展名>`，各部分用下划线分隔。下载文件的校验值见 [SHA256SUMS.txt](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.1/SHA256SUMS.txt)，便携 ZIP 另附 [同名 .zip.sha256 文件](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.1/PDF_Bookmarks_v1.5.1_win_x64_portable.zip.sha256)。`update-manifest.json` 供程序检查更新使用，无需手动运行。
 
-历史 [v1.4.1 发行版](https://github.com/Zerozero05/PDF_Bookmarks/releases/tag/v1.4.1)及其文件保持不变，旧 ZIP 内部名称仍为 `ZoteroPDFBookmarks`。v1.5.0 包内采用 `PDF_Bookmarks.exe`，继续沿用原设置路径。
+历史 [v1.4.1 发行版](https://github.com/Zerozero05/PDF_Bookmarks/releases/tag/v1.4.1)及其文件保持不变，旧 ZIP 内部名称仍为 `ZoteroPDFBookmarks`。v1.5.0 及后续包内采用 `PDF_Bookmarks.exe`，继续沿用原设置路径。
+
+## v1.5.1 目录识别更新
+
+- 修复扫描目录的长点线触发文字误翻转，减少漏章、漏节；分离点线后重读短标题，保留原页码与已有编号。
+- 自动生成标题在编号与标题之间保留一个空格，省略数字节号前的 `§`；章下无编号直接子节补 `章号.节号`，跨页继续且避开已有编号。
+- 译名对照表、关键词索引、习题答案等独立书末条目按一级目录处理，避免误挂到最后一章。
+- 自动结果仍需人工核对；手工编辑、导入 JSON 和复用已有 PDF 书签的标题保持原样。设置路径、JSON/CLI 接口与写入安全机制继续兼容。
+
+详细变化见 [版本记录](CHANGELOG.md)，验证范围与局限见 [验证记录](VALIDATION.md)。
 
 ## 程序更新
 
@@ -29,7 +38,7 @@ v1.5.0 的 Single 与 Portable GUI 增加“帮助 / 更新”：显示当前版
 
 更新保持当前发行类型、实际 EXE 文件名和文件夹位置；改名、中文/空格路径、移动整个便携文件夹均支持。Portable 仅更新清单中受管理的程序文件，清除废弃运行库，保留用户 PDF、配置和未知文件。新版完成配置、PDF 核心和主窗口健康检查后才提交；失败时同步恢复旧程序与旧配置。
 
-**v1.4.1 没有更新器，第一次升级须手动下载 v1.5.0。** 关闭旧程序后从发行版页面下载：Single 运行新 EXE 即可；Portable 须完整解压新文件夹，保留 `_internal` 与 `package-manifest.json`。两者设置仍在 `%LOCALAPPDATA%\ZoteroPDFBookmarks\settings.json`，无需重新设置。源码运行和 CLI 不执行 GUI 自身更新。
+**v1.4.1 没有更新器，第一次升级须手动下载 v1.5.1。** 关闭旧程序后从发行版页面下载：Single 运行新 EXE 即可；Portable 须完整解压新文件夹，保留 `_internal` 与 `package-manifest.json`。两者设置仍在 `%LOCALAPPDATA%\ZoteroPDFBookmarks\settings.json`，无需重新设置。源码运行和 CLI 不执行 GUI 自身更新。
 
 机制与故障处理见 [自动更新说明](docs/AUTO_UPDATE.md)，逐项验证记录见 [更新验收矩阵](docs/UPDATE_ACCEPTANCE.md)。
 
@@ -82,6 +91,8 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-build.txt
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
+
+v1.5.1 本机327项完整回归、四类冻结程序身份/资源及真实更新/回滚4场景通过；扫描样例目录由34项恢复至39项，结果仍需人工校对，完整冻结GUI的真实书籍OCR交互尚未验证。详情见 [VALIDATION.md](VALIDATION.md) 和 [本次发行说明](docs/RELEASE_NOTES.md)。
 
 固定依赖在 `requirements.txt` 和 `requirements-build.txt`。v1.5.0 本机完整回归 303 项通过，真实冻结 Single/Portable 的成功升级和失败回滚共四个场景通过；[云端验证](https://github.com/Zerozero05/PDF_Bookmarks/actions/runs/37604195474)通过，其中一项跨盘测试因单盘环境跳过，本机已实际通过。详细结果与边界见 [UPDATE_ACCEPTANCE.md](docs/UPDATE_ACCEPTANCE.md)。原 v1.4.1 的历史验证保留在 [VALIDATION.md](VALIDATION.md)。
 

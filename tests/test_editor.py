@@ -164,6 +164,36 @@ class EditorIntegrationTests(unittest.TestCase):
         self.assertEqual(len({identity for _, identity in calls}), 1)
         self.assertNotEqual(calls[0][1], main_thread)
 
+    def test_generated_titles_display_and_save_through_workbench(self):
+        titles = ["第一章迭代与动力系统", "§1.1迭代", "动力系统"]
+        with pymupdf.open() as document:
+            page = document.new_page()
+            page.insert_text((30, 35), "Contents")
+            for index, title in enumerate(titles, 1):
+                page.insert_text((30, 60 + index * 30), f"{title} .... {index}", fontname="china-s")
+            for index, title in enumerate(titles, 1):
+                page = document.new_page()
+                page.insert_text((30, 50), title, fontname="china-s")
+                page.insert_text((30, 100), "Original readable body text.")
+                page.insert_text((280, 825), str(index))
+            document.save(self.pdf)
+        self.source_sha = hashlib.sha256(self.pdf.read_bytes()).hexdigest()
+        self.editor.start.set("1")
+        self.editor.end.set("1")
+        self.editor.generate()
+        self.spin(lambda: self.editor.draft is not None and not self.editor.busy)
+        self.assertEqual([self.editor.tree.item(row, "values")[1] for row in self.editor.tree.get_children()],
+                         ["目录", "第一章 迭代与动力系统", "1.1 迭代", "1.2 动力系统"])
+        self.assertFalse(any(entry.confirmed for entry in self.editor.draft.entries))
+        with patch.object(toc_editor.messagebox, "askyesno", return_value=True):
+            self.editor.confirm_all()
+        self.editor.save()
+        self.spin(lambda: self.editor.closed)
+        data = json.loads(self.pdf.with_suffix(".toc.json").read_text(encoding="utf-8"))
+        self.assertEqual(data["bookmarks"][1]["title"], "第一章 迭代与动力系统")
+        self.assertEqual([node["title"] for node in data["bookmarks"][1]["children"]], ["1.1 迭代", "1.2 动力系统"])
+        self.assertEqual(self.errors, [])
+
     def test_saving_rejects_original_pdf_filename(self):
         self.load(self.draft(confirmed=True))
         with patch.object(toc_editor.filedialog, "asksaveasfilename", return_value=str(self.pdf)), patch.object(toc_editor, "save_toc") as save:

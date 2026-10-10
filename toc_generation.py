@@ -54,7 +54,7 @@ class _Line:
 _PART = re.compile(r"^(?:第\s*[\d一二三四五六七八九十百零〇]+\s*[篇部卷]|part\s+(?:[\divxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten)\b)", re.I)
 _CHAPTER = re.compile(r"^(?:第\s*[\d一二三四五六七八九十百零〇]+\s*[章篇部卷]|(?:chapter|part)\s+(?:[\divxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten)\b)", re.I)
 _FRONT = re.compile(r"^(?:前言|序言|自序|序|致谢|出版说明|preface|foreword|acknowledg)", re.I)
-_ROOT = re.compile(r"^(?:附录|参考文献|索引|习题解答|appendix|references|bibliography|index)", re.I)
+_ROOT = re.compile(r"^(?:附录|参考文献|索引|习题解答|appendix|references|bibliography|index|(?:外国)?(?:数学家)?译名对照表$|关键词索引$|(?:部分)?习题答案(?:和提示)?$)", re.I)
 _LEVEL_ROOT = re.compile(r"^(?:符号表|注释|prologue\b|notes\s+and\s+comments|list\s+of\s+(?:special\s+)?symbols)", re.I)
 _PAGE = re.compile(r"^(.*?)(?:\s|[.．·…⋯_—-])+(\d{1,5}|[ivxlcdmIVXLCDM]{1,10})\s*$")
 _NUM = re.compile(r"^[\s\-—–·.]*([0-9]{1,5})[\s\-—–·.]*$")
@@ -253,6 +253,91 @@ def _normal(text):
     return re.sub(r"[^\w\u3400-\u9fff]", "", text).casefold()
 
 
+def _heading_number(text):
+    """Read the chapter/section numerals already supported by recognition."""
+    if text.isdecimal():
+        return int(text)
+    digits = dict(zip("零〇一二三四五六七八九", (0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9)))
+    if all(char in digits for char in text):
+        return int("".join(str(digits[char]) for char in text))
+    if all(char in digits or char in "十百" for char in text):
+        total, value = 0, 0
+        for char in text:
+            if char in "十百":
+                total += (value or 1) * {"十": 10, "百": 100}[char]
+                value = 0
+            else:
+                value = digits[char]
+        return total + value
+    words = "one two three four five six seven eight nine ten".split()
+    if text.casefold() in words:
+        return words.index(text.casefold()) + 1
+    if not re.fullmatch(r"[ivxlcdm]+", text, re.I):
+        return None
+    total, previous = 0, 0
+    for char in reversed(text.upper()):
+        value = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}[char]
+        total += -value if value < previous else value
+        previous = max(previous, value)
+    return total
+
+
+def _format_generated_titles(draft):
+    """Format automatic titles after page evidence, leaving imported titles alone."""
+    numeral = r"[\d一二三四五六七八九十百零〇]+"
+    prefix = re.compile(rf"^(?:第\s*{numeral}\s*(?:小节|章|节|篇|部|卷)|"
+                        rf"(?:chapter|part)\s+(?:[\divxlcdm]+|one|two|three|four|five|six|seven|eight|nine|ten)\b|"
+                        rf"(?:section\s+|sec\.\s*)\d+(?:\s*[.．]\s*\d+)*(?![\d.．])|"
+                        rf"§?\s*\d+(?:\s*[.．]\s*\d+)+(?![\d.．])|§\s*\d+(?![\d.．])|\d+(?=\s|$)|"
+                        rf"[一二三四五六七八九十百]+[、．]|[（(][一二三四五六七八九十百]+[）)])", re.I)
+
+    def section_number(title, chapter):
+        numbered = re.sub(r"^(?:section\s+|sec\.\s*)", "", title, flags=re.I)
+        match = re.match(r"^(\d+)(?:[.．](\d+))?(?=\s|$)", numbered)
+        if match:
+            return int(match[2]) if match[2] and int(match[1]) == chapter else (int(match[1]) if not match[2] else None)
+        match = re.match(rf"^(?:第\s*({numeral})\s*节|([一二三四五六七八九十百]+)[、．])", title)
+        return _heading_number(match[1] or match[2]) if match else None
+
+    for entry in draft.entries:
+        if match := prefix.match(entry.title):
+            label = match[0].lstrip("§").strip()
+            if re.match(r"^(?:chapter|part|section)\b|^sec\.", label, re.I):
+                label = re.sub(r"\s+", " ", label)
+            else:
+                label = re.sub(r"\s+", "", label)
+            entry.title = (label + " " + entry.title[match.end():].strip()).rstrip()
+
+    chapter, chapter_level, sequence, reserved = None, 0, 0, set()
+    for index, entry in enumerate(draft.entries):
+        match = re.match(rf"^第\s*({numeral})\s*章", entry.title)
+        english = _CHAPTER.match(entry.title) if re.match(r"^chapter\b", entry.title, re.I) else None
+        if match or english:
+            chapter = _heading_number(match[1] if match else english[0].split()[1])
+            chapter_level, sequence, reserved = entry.level, 0, set()
+            # Reserve existing numbers even when they appear after a missing one.
+            for following in draft.entries[index + 1:]:
+                if following.level <= chapter_level:
+                    break
+                if following.level == chapter_level + 1:
+                    number = section_number(following.title, chapter)
+                    if number is not None:
+                        reserved.add(number)
+        elif entry.level <= chapter_level or _PART.match(entry.title) or _ROOT.match(entry.title) or _FRONT.match(entry.title) or _LEVEL_ROOT.match(entry.title):
+            chapter = None
+        elif chapter is not None and entry.level == chapter_level + 1:
+            number = section_number(entry.title, chapter)
+            if number is not None:
+                sequence = max(sequence, number)
+            elif not prefix.match(entry.title) and _level(entry.title) == 1:
+                sequence += 1
+                while sequence in reserved:
+                    sequence += 1
+                entry.title = f"{chapter}.{sequence} {entry.title}"
+                entry.note += " 根据章内顺序补充节编号，请核对。"
+    return draft
+
+
 def _level(title):
     if _CHAPTER.match(title) or _FRONT.match(title) or _ROOT.match(title) or _LEVEL_ROOT.match(title):
         return 1
@@ -348,6 +433,111 @@ def _looks_toc(lines, parsed):
     return (header and len(parsed) >= 2) or (len(parsed) >= 5 and numbered >= 3)
 
 
+def _title_crop(image, line):
+    """Find a repeated pixel dot leader without guessing the title width."""
+    import cv2
+
+    height = line.height
+    crop = image[max(0, int(line.y - height / 2) - 5):int(line.y + height / 2) + 5,
+                 max(0, int(line.x) - 5):]
+    if not crop.size:
+        return None
+    _, ink = cv2.threshold(cv2.cvtColor(crop, cv2.COLOR_RGB2GRAY), 0, 255,
+                          cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)
+    _, _, stats, centers = cv2.connectedComponentsWithStats(ink, 8)
+    dots = sorted([(stat, center) for stat, center in zip(stats[1:], centers[1:])
+                   if stat[2] <= height * .2 and stat[3] <= height * .2
+                   and 2 <= stat[4] <= height * height * .04], key=lambda item: item[0][0])
+    runs, run = [], []
+    for dot in dots:
+        if run and not (abs(dot[1][1] - run[-1][1][1]) < height * .15
+                        and 0 < dot[1][0] - run[-1][1][0] < height * .7):
+            if len(run) >= 6:
+                runs.append(run)
+            run = []
+        run.append(dot)
+    if len(run) >= 6:
+        runs.append(run)
+    end = int(max(runs, key=len)[0][0][0]) - 1 if runs else 0
+    return crop[:, :end] if end > height else None
+
+
+def _refine_ocr_titles(pix, lines, engine, cancel):
+    """Re-read image-backed short titles, retaining the original page numbers."""
+    from difflib import SequenceMatcher
+    import numpy as np
+
+    def label(text):
+        match = _CHAPTER.match(text) or re.match(
+            r"^(?:[§S]?\s*\d+(?:\s*[.．]\s*\d+)*|"
+            r"第\s*[\d一二三四五六七八九十百零〇]+\s*(?:小节|节)|"
+            r"(?:section|subsection|sec\.)\s*\d+(?:\s*[.．]\s*\d+)*|"
+            r"[一二三四五六七八九十百]+[、．]|[（(][一二三四五六七八九十百]+[）)])", text, re.I)
+        if match:
+            return re.sub(r"^[§S](?=\s*\d)|\s+", "", match[0]).replace("．", ".").casefold()
+
+    image = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.height, pix.width, pix.n)
+    candidates = []
+    for line in lines:
+        _cancelled(cancel)
+        parsed = _parse([line])
+        if parsed and (crop := _title_crop(image, line)) is not None:
+            candidates.append((line, parsed[0][0], _PAGE.match(line.text)[2], crop))
+    if not candidates:
+        return
+    _cancelled(cancel)
+    crops, _ = engine.cls_and_rotate([item[3] for item in candidates])
+    _cancelled(cancel)
+    result = engine.recognize_txt(crops)
+    _cancelled(cancel)
+    if result.txts is None or result.scores is None:
+        return
+    for (line, old_title, page, _), text, score in zip(candidates, result.txts, result.scores):
+        title = _clean(text)
+        old_key, key = _normal(old_title), _normal(title)
+        old_label = label(old_title)
+        if old_label is not None and label(title) != old_label:
+            continue
+        if (title and not _NUM.match(title) and len(key) >= len(old_key)
+                and score >= max(.92, line.score) and SequenceMatcher(None, old_key, key).ratio() >= .7):
+            line.text = f"{title} {page}"
+
+
+def _ocr_lines(pix, cancel=None):
+    """Compare TOC orientations; long leaders can fool the angle classifier."""
+    engine = _engine()
+    original_cls = engine.use_cls
+    image = pix.tobytes("png")
+
+    def recognize(use_cls):
+        _cancelled(cancel)
+        output = engine(image, use_cls=use_cls)
+        if output.boxes is None or output.txts is None:
+            return []
+        return _group_boxes([
+            (float(min(box[:, 0])), float(min(box[:, 1])), float(max(box[:, 0])),
+             float(max(box[:, 1])), str(text), float(score))
+            for box, text, score in zip(output.boxes, output.txts, output.scores)
+        ])
+
+    def quality(lines):
+        parsed = _parse(lines)
+        return len(parsed), sum(score for _, _, score, _ in parsed)
+
+    try:
+        lines = recognize(True)
+        leaders = sum(bool(re.search(r"[.．·…⋯](?:\s*[.．·…⋯]){3}", line.text)) for line in lines)
+        if _looks_toc(lines, _parse(lines)) or leaders >= 2:
+            upright = recognize(False)
+            if quality(upright) > quality(lines):
+                lines = upright
+            _refine_ocr_titles(pix, lines, engine, cancel)
+        return lines
+    finally:
+        # RapidOCR call options persist on its singleton; keep later pages safe.
+        engine.use_cls = original_cls
+
+
 def generate_toc(pdf_path, *, toc_start=None, toc_end=None, offset=None, prefer_existing=False, progress=None, cancel=None):
     """Recognize a reviewable draft without changing the PDF or its caches."""
     path = Path(pdf_path).expanduser().absolute()
@@ -385,21 +575,18 @@ def generate_toc(pdf_path, *, toc_start=None, toc_end=None, offset=None, prefer_
                 useful = "".join(str(word[4]) for word in words)
                 if len(useful) >= 8 and useful.count("�") < len(useful) * .1:
                     boxes = [(a, b, c, d, str(text), 1.0) for a, b, c, d, text, *_ in words]
+                    lines = _group_boxes(boxes)
                     width, height = page.rect.width, page.rect.height
                     methods.add("文字提取")
                 else:
                     report(f"本地 OCR：PDF 第 {number}/{count} 页……")
                     scale = min(4.0, 1900 / max(page.rect.width, page.rect.height))
                     pix = page.get_pixmap(matrix=pymupdf.Matrix(scale, scale), alpha=False)
-                    output = _engine()(pix.tobytes("png"))
-                    boxes = []
-                    if output.boxes is not None and output.txts is not None:
-                        for box, text, score in zip(output.boxes, output.txts, output.scores):
-                            boxes.append((float(min(box[:, 0])), float(min(box[:, 1])), float(max(box[:, 0])), float(max(box[:, 1])), str(text), float(score)))
+                    lines = _ocr_lines(pix, cancel)
                     width, height = pix.width, pix.height
                     methods.add("本地 OCR")
                 _cancelled(cancel)
-                cache[number] = (_group_boxes(boxes), width, height)
+                cache[number] = (lines, width, height)
             return cache[number]
 
         toc_pages, parts, layout = [], [], []
@@ -458,7 +645,7 @@ def generate_toc(pdf_path, *, toc_start=None, toc_end=None, offset=None, prefer_
         if offset is not None:
             generated_mapping({"offset": offset})
             notes.append("使用用户指定固定偏移；仍须检查中途缺页或插页。")
-            return draft
+            return _format_generated_titles(draft)
 
         def footer(number):
             lines, width, height = read(number)
@@ -480,12 +667,12 @@ def generate_toc(pdf_path, *, toc_start=None, toc_end=None, offset=None, prefer_
         candidates = counts.most_common()
         if not candidates or candidates[0][1] < 2 or (len(candidates) > 1 and candidates[1][1] == candidates[0][1]):
             notes.append("未找到至少两页一致的正文页码证据，请输入固定偏移或分段映射。")
-            return draft
+            return _format_generated_titles(draft)
         suggested = candidates[0][0]
         printed_entries = [entry for entry in entries if entry.printed_page is not None]
         if not printed_entries:
             notes.append("目录未包含可用于正文映射的阿拉伯页码，请逐项指定实际 PDF 页。")
-            return draft
+            return _format_generated_titles(draft)
         sample_indices = sorted({round(index * (len(printed_entries) - 1) / 5) for index in range(6)})
         verified, conflicts = [], []
         for index in sample_indices:
@@ -507,7 +694,7 @@ def generate_toc(pdf_path, *, toc_start=None, toc_end=None, offset=None, prefer_
             for entry, target in verified:
                 entry.pdf_page = target
                 entry.note += " 此目标有页码或标题证据，整体映射仍待校正。"
-            return draft
+            return _format_generated_titles(draft)
         generated_mapping({"offset": suggested})
         for entry, target in verified:
             if entry.confidence != "低":
@@ -515,4 +702,4 @@ def generate_toc(pdf_path, *, toc_start=None, toc_end=None, offset=None, prefer_
             entry.note += " 目标页有独立页码或标题证据；标题仍需校对。"
         notes.append(f"建议固定偏移 {suggested:+d}：正文开头 {counts[suggested]} 页一致，跨目录抽样 {len(verified)} 项有支持证据。未检查每一页。")
         draft.method = " + ".join(sorted(methods))
-        return draft
+        return _format_generated_titles(draft)

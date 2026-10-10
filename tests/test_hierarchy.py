@@ -100,6 +100,13 @@ class HierarchyTests(unittest.TestCase):
         )]])
         self.assertEqual(self.levels(draft), [1, 2, 1, 2, 1, 1, 1, 1])
 
+    def test_translation_list_keyword_index_and_answers_are_root_matter(self):
+        draft = self.recognize([[(title, 40) for title in (
+            "第六章 定性理论", "关键词索引的应用", "外国数学家译名对照表",
+            "关键词索引", "参考文献", "部分习题答案和提示",
+        )]])
+        self.assertEqual(self.levels(draft), [1, 2, 1, 1, 1, 1])
+
 
 if __name__ == "__main__":
     unittest.main()

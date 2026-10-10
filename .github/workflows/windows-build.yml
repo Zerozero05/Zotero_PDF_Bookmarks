@@ -140,7 +140,19 @@ jobs:
           $tag = "v$env:RELEASE_VERSION"
           gh release view $tag --json id 2>$null
           if ($LASTEXITCODE -eq 0) { throw "Release $tag already exists; it will not be overwritten" }
-          $notes = "Windows x64 版，提供 Single 单文件 GUI、Portable 便携文件夹、CLI 和完整源码包，可独立处理普通 PDF，并适配 Zotero 附件。`n`nSingle 直接运行，携带方便；Portable 整包解压后运行，省去启动时的临时解包。两者功能相同，无需 Python。Portable 须保留 _internal 和 package-manifest.json。`n`nGUI 自动更新保持 Single/Portable 类型、用户改名后的入口、现有设置及 Portable 中的未知文件；健康检查失败时回滚程序和配置，成功后清理废弃的受管理文件。CLI 通过发布页手动更新。v1.4.1 没有自动更新，首次使用新版须手动下载。CONFIG_SCHEMA 保持 1。`n`n更新记录：https://github.com/$env:GH_REPO/blob/$tag/CHANGELOG.md。`n`n下载后用 SHA256SUMS.txt 或 Portable 同名 .sha256 文件核对。update-manifest.json 描述两种 GUI 更新资产。"
+          # Use the reviewed, version-specific notes bundled with these assets.
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $fullPackage = Join-Path artifacts "PDF_Bookmarks_${tag}_win_x64_full.zip"
+          $archive = [System.IO.Compression.ZipFile]::OpenRead($fullPackage)
+          try {
+            $entry = $archive.GetEntry('PDF_Bookmarks/docs/RELEASE_NOTES.md')
+            if ($null -eq $entry) { throw 'Complete package is missing release notes' }
+            $reader = [System.IO.StreamReader]::new($entry.Open(), [System.Text.Encoding]::UTF8)
+            try { $notes = $reader.ReadToEnd() } finally { $reader.Dispose() }
+          } finally { $archive.Dispose() }
+          if ($notes -notmatch ('\A# ' + [regex]::Escape($tag) + '(\r?\n|$)')) {
+            throw 'Release notes version does not match the release tag'
+          }
           $notesPath = Join-Path $env:RUNNER_TEMP release-notes.md
           [System.IO.File]::WriteAllText($notesPath, $notes, [System.Text.UTF8Encoding]::new($false))
           $assets = @(Get-ChildItem artifacts -File | ForEach-Object { $_.FullName })

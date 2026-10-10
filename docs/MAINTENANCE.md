@@ -1,11 +1,11 @@
 # 版本维护与本地文件管理
 
-正式源代码以 [Zerozero05/PDF_Bookmarks](https://github.com/Zerozero05/PDF_Bookmarks) 为准，正式 Windows 下载放在 [Releases](https://github.com/Zerozero05/PDF_Bookmarks/releases)。PDF_Bookmarks 可独立处理普通 PDF，也适配 Zotero 附件。当前版本为 v1.5.0，增加事务自动更新；历史 v1.4.1 发行版继续保留。原设置位置、目录 JSON 格式、CLI 参数、PDF 写入与备份默认值继续兼容。
+正式源代码以 [Zerozero05/PDF_Bookmarks](https://github.com/Zerozero05/PDF_Bookmarks) 为准，正式 Windows 下载放在 [Releases](https://github.com/Zerozero05/PDF_Bookmarks/releases)。PDF_Bookmarks 可独立处理普通 PDF，也适配 Zotero 附件。当前准备版本为 v1.5.1，增强扫描目录识别与自动标题格式；沿用 v1.5.0 的事务自动更新，历史 v1.5.0、v1.4.1 发行版继续保留。原设置位置、目录 JSON 格式、CLI 参数、PDF 写入与备份默认值继续兼容。
 
 ## 后续升级流程
 
 1. 向 Codex 提供仓库链接，说明修改需求及必须保留的功能。开始前读取当前 `VERSION`、`README.md`、`CHANGELOG.md`、`AGENTS.md` 和相关代码，以仓库最新状态为基础修改。
-2. 在独立分支完成必要修改，增加相应回归验证，更新版本与说明。先生成可供本地试用的 Windows EXE；可本地打包，也可下载 GitHub Actions 的构建产物。
+2. 在独立分支完成必要修改，增加相应回归验证，更新版本与说明。同步维护 `docs/RELEASE_NOTES.md` 的版本标题、具体更新、兼容性、附件与验证局限；发布流程从完整包中读取这份正文，版本不符则停止。先生成可供本地试用的 Windows EXE；可本地打包，也可下载 GitHub Actions 的构建产物。
 3. 用户试用、提出调整并确认结果。确认前可以继续修复、测试和准备发布材料，不推送正式版本标签。
 4. 用户明确确认发布后，合入经过检查的代码，推送与 `VERSION` 一致的 `v版本号` 标签。发布流程再次测试、构建两种 GUI、CLI 和外部 updater，生成 Portable 清单、更新 manifest 与校验文件；真实冻结更新验收通过后创建草稿 Release，上传并核对全部资产后才转为正式发布。按下方命名规则检查标题、文件名和校验清单，不覆盖已有同名 Release。
 5. 核对 Release 的版本、文件清单、下载和校验值后，让用户选择保留或删除本地旧 EXE。删除选择与发布确认分开，发布不会自动删除本地文件。
@@ -60,7 +60,7 @@ py -3.12 -m venv .venv
 
 `build_exe.cmd` 会运行测试，调用 `scripts/build_windows.py` 构建独立 updater、Single（`dist\PDF_Bookmarks.exe`）、CLI（`dist\PDF_Bookmarks_CLI.exe`）和 Portable（`dist\portable\PDF_Bookmarks\PDF_Bookmarks.exe` 及完整运行文件夹）。`scripts/package_release.py` 从已加入 Git 管理的源码生成完整包、便携包、manifest 和校验清单；不要把用户配置或已运行生成的 `.pdf_bookmarks` 放进分发包。PDF 写入、备份、缓存、删除 JSON 和更新回滚测试必须使用临时生成的文件，不使用真实 Zotero 附件或用户配置。已有验证见 [VALIDATION.md](../VALIDATION.md)，本次更新验证见 [UPDATE_ACCEPTANCE.md](UPDATE_ACCEPTANCE.md)。
 
-`scripts/build_windows.py --test-version 1.5.1` 仅用于合成新版更新验收，产物隔离在 `dist\test_v1.5.1`，不能进入当前生产版本的正式资产。该参数不修改 `VERSION`。真实冻结验收必须核对改名后的目标 EXE 内容与 BuildInfo、GUI/config/core 健康回执、受管理文件/配置恢复和事务目录清理，不能以“进程启动了”代替。
+`scripts/build_windows.py --test-version 1.5.2` 仅用于合成新版更新验收，产物隔离在 `dist\test_v1.5.2`，不能进入当前生产版本的正式资产。该参数不修改 `VERSION`。真实冻结验收必须核对改名后的目标 EXE 内容与 BuildInfo、GUI/config/core 健康回执、受管理文件/配置恢复和事务目录清理，不能以“进程启动了”代替。
 
 ## GitHub 与本地占用
 

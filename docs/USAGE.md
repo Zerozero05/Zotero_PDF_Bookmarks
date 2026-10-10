@@ -1,8 +1,8 @@
 # PDF_Bookmarks 完整使用说明
 
-本页说明 PDF_Bookmarks 的使用方式及单文件、便携文件夹两种打包形式。当前正式发行版为 [v1.5.0](https://github.com/Zerozero05/PDF_Bookmarks/releases/tag/v1.5.0)，新增 GUI 自动更新入口；既有 PDF/目录功能与默认设置保留。源码命令均在仓库根目录执行。项目首页见 [README.md](../README.md)，维护流程见 [MAINTENANCE.md](MAINTENANCE.md)。
+本页说明 PDF_Bookmarks 的使用方式及单文件、便携文件夹两种打包形式。当前正式发行版为 [v1.5.1](https://github.com/Zerozero05/PDF_Bookmarks/releases/tag/v1.5.1)，增强扫描目录识别与自动目录标题规范化；既有 PDF/目录功能与默认设置保留。源码命令均在仓库根目录执行。项目首页见 [README.md](../README.md)，维护流程见 [MAINTENANCE.md](MAINTENANCE.md)。
 
-当前 Windows 版：**v1.5.0**。v1.4.1 增加的“写入成功后删除目录 JSON”仍为可选项，默认关闭，并记住上次选择。v1.4 的自动编辑、多选改层级、JSON 保存目录、独立目录工作台，以及原有拖放、预览、写入、批量、备份和茉莉花缓存清理功能保留。
+当前 Windows 版：**v1.5.1**。v1.4.1 增加的“写入成功后删除目录 JSON”仍为可选项，默认关闭，并记住上次选择。v1.4 的自动编辑、多选改层级、JSON 保存目录、独立目录工作台，以及原有拖放、预览、写入、批量、备份和茉莉花缓存清理功能保留。
 
 v1.2.1 修复滚动区域背景框遮挡内容的问题：拖入文件后的处理列表、预览后的书签树、目标页图片和处理记录现在能够正常显示和点击。关闭旧程序后换用新版 EXE 即可，原有设置自动保留；PDF 写入、备份、缓存清理和命令行逻辑没有改动。
 
@@ -16,11 +16,11 @@ v1.2.1 修复滚动区域背景框遮挡内容的问题：拖入文件后的处�
 
 | 下载文件 | 打开方式 |
 | --- | --- |
-| [PDF_Bookmarks_v1.5.0_win_x64.exe](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.0/PDF_Bookmarks_v1.5.0_win_x64.exe) | 单文件版，直接运行；每次启动会临时解包运行库 |
-| [PDF_Bookmarks_v1.5.0_win_x64_portable.zip](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.0/PDF_Bookmarks_v1.5.0_win_x64_portable.zip) | 便携文件夹版，完整解压后运行 `PDF_Bookmarks\PDF_Bookmarks.exe` |
-| [PDF_Bookmarks_v1.5.0_win_x64_full.zip](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.0/PDF_Bookmarks_v1.5.0_win_x64_full.zip) | 完整包，含源码、CLI、说明和单文件 GUI；解压后运行 `PDF_Bookmarks\dist\PDF_Bookmarks.exe` |
+| [PDF_Bookmarks_v1.5.1_win_x64.exe](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.1/PDF_Bookmarks_v1.5.1_win_x64.exe) | 单文件版，直接运行；每次启动会临时解包运行库 |
+| [PDF_Bookmarks_v1.5.1_win_x64_portable.zip](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.1/PDF_Bookmarks_v1.5.1_win_x64_portable.zip) | 便携文件夹版，完整解压后运行 `PDF_Bookmarks\PDF_Bookmarks.exe` |
+| [PDF_Bookmarks_v1.5.1_win_x64_full.zip](https://github.com/Zerozero05/PDF_Bookmarks/releases/download/v1.5.1/PDF_Bookmarks_v1.5.1_win_x64_full.zip) | 完整包，含源码、CLI、说明和单文件 GUI；解压后运行 `PDF_Bookmarks\dist\PDF_Bookmarks.exe` |
 
-便携版须让 EXE、`_internal`、`package-manifest.json` 与其余文件保留在同一文件夹内；移动时移动整个 `PDF_Bookmarks` 文件夹。它省去每次启动的临时解包，功能与单文件版相同，不承诺每页 OCR 或 PDF 写入提速。完整 Windows ZIP 中的 GUI 仍是单文件版，与便携 ZIP 不同。下载文件使用 `SHA256SUMS.txt` 校验；便携 ZIP 另附 `PDF_Bookmarks_v1.5.0_win_x64_portable.zip.sha256`。`update-manifest.json` 供程序检查更新使用。原设置路径保持不变；历史 v1.4.1 的 ZIP 内部名称仍为 `ZoteroPDFBookmarks`。
+便携版须让 EXE、`_internal`、`package-manifest.json` 与其余文件保留在同一文件夹内；移动时移动整个 `PDF_Bookmarks` 文件夹。它省去每次启动的临时解包，功能与单文件版相同，不承诺每页 OCR 或 PDF 写入提速。完整 Windows ZIP 中的 GUI 仍是单文件版，与便携 ZIP 不同。下载文件使用 `SHA256SUMS.txt` 校验；便携 ZIP 另附 `PDF_Bookmarks_v1.5.1_win_x64_portable.zip.sha256`。`update-manifest.json` 供程序检查更新使用。原设置路径保持不变；历史 v1.4.1 的 ZIP 内部名称仍为 `ZoteroPDFBookmarks`。
 
 1. 从发布页下载所选程序，按上表打开。程序面向 Windows 10/11 x64。
 2. 找到需要添加或更新书签的 PDF，关闭这本 PDF 的阅读窗口。
@@ -84,6 +84,10 @@ py -3 -m venv .venv
 5. 固定偏移例如 `+12` 表示印刷第 1 页对应 PDF 第 13 页。遇到缺页、插页时，可使用分段映射：每行填写“印刷起页, 印刷止页, PDF 起页”，例如 `1,100,13` 和 `101,200,114`。每段范围包含两端。
 6. 核对后勾选“已核对目标页”，确认状态立即更新到表格。确认所有条目时仍会提醒先检查结果；没有有效目标页的条目不能确认或保存。修改条目或重新应用映射后，相关条目需要重新确认。
 7. 在工作台底部选择 JSON 的保存位置：默认使用原目录文件所在位置（新生成时使用 PDF 旁的同名 `书名.toc.json`），也可以选择自定义文件夹。自定义路径会记住，下次无需重新浏览。点“保存 JSON 并返回”直接使用该位置，已有文件仍需确认覆盖；需要临时改文件名或路径时使用“另存为…”。工作台只保存 JSON，不写 PDF，也不删除插件缓存。保存后回到原处理列表并进行只读预览；如果主窗口正在处理，会等待结束后载入，仍须使用原“写入勾选的 PDF”完成写入。
+
+v1.5.1 的自动标题格式：编号与标题之间保留一个空格，例如 `第一章迭代与动力系统` → `第一章 迭代与动力系统`、`§1.1迭代` → `1.1 迭代`。已识别章下的无编号直接子节按章号与节顺序补号，例如第一章下的 `迭代` → `1.1 迭代`；已有节号保留并避开重复，跨目录页继续编号，补号结果仍需核对。仅用于从 PDF 自动识别的新草稿；手工编辑、导入 JSON 和复用已有 PDF 书签的标题保持原样。
+
+v1.5.1 同时增强了扫描目录识别：对疑似目录比较保留与纠正文字方向的本地 OCR 结果，减少长点线导致的误翻转漏项；在图像中找到连续点线时，分离短标题重读，保留原页码、已有编号及原行可信度。译名对照表、关键词索引和习题答案等书末目录按独立一级条目处理。识别结果仍须校对确认，模糊或特殊布局的扫描件可能需要手工修正。
 
 批量改层级：在目录表中用 Ctrl 或 Shift 多选，保持表格获得焦点后按数字键 1–9，设置选中项的层级；也可以按住选中行的层级列横向拖动，向右增加层级数字、向左减少，每移动约 30 像素调整一级，松开时应用。拖动修改层级，不重排条目。操作会检查完整层级序列，第一项须为一级，后项不能跳过尚未出现的上级；不合法时保留原结果并提示需要调整哪些选中项。标题或页码输入框中的数字仍作为输入文字。
 
@@ -161,7 +165,7 @@ Windows EXE 包含中文/英文 OCR 模型和 CPU 运行库，识别不上传 PD
 
 ## 命令行
 
-源码入口：`launch_cli.cmd`；本地构建或完整包中的可执行入口：`dist\PDF_Bookmarks_CLI.exe`；发布页单独下载的 CLI 文件名为 `PDF_Bookmarks_v1.5.0_win_x64_cli.exe`。下面的命令在项目文件夹中运行，也可把 `launch_cli.cmd` 替换为所用 CLI 的实际路径。
+源码入口：`launch_cli.cmd`；本地构建或完整包中的可执行入口：`dist\PDF_Bookmarks_CLI.exe`；发布页单独下载的 CLI 文件名为 `PDF_Bookmarks_v1.5.1_win_x64_cli.exe`。下面的命令在项目文件夹中运行，也可把 `launch_cli.cmd` 替换为所用 CLI 的实际路径。
 
 ```powershell
 # 预览同名目录文件
@@ -287,7 +291,7 @@ _backup\书名.20261003-143015-123456.a1b2c3d4.pdf
 
 程序更新不会重置设置。两种 GUI 仍共用 `%LOCALAPPDATA%\ZoteroPDFBookmarks\settings.json`；新版默认补齐新增设置、保留未知字段，配置需要迁移时先备份并验证。新版初始化失败将恢复旧程序与旧配置；成功后删除旧程序备份和更新临时文件，仍被运行中的 helper 占用的内容由后台重试或下次启动继续清理。
 
-**从 v1.4.1 升级时须先手动下载 v1.5.0**，旧版没有更新入口。先关闭旧程序，再运行新 Single EXE 或完整解压的新 Portable 文件夹，原设置自动沿用。源码运行及 CLI 使用发行版页面手动下载；程序不会覆盖 Python 解释器或把 CLI 替换为 GUI。未点击安装而直接退出时，已准备的更新会被取消；“退出时安装”和“跳过此版本”列入后续阶段。
+**从 v1.4.1 升级时须先手动下载 v1.5.1**，旧版没有更新入口。先关闭旧程序，再运行新 Single EXE 或完整解压的新 Portable 文件夹，原设置自动沿用。源码运行及 CLI 使用发行版页面手动下载；程序不会覆盖 Python 解释器或把 CLI 替换为 GUI。未点击安装而直接退出时，已准备的更新会被取消；“退出时安装”和“跳过此版本”列入后续阶段。
 
 权限不足时先关闭程序并移动到可写目录重试，或明确选择以管理员权限运行；不在替换一半后请求提权。更新失败诊断保存在本程序临时更新目录的 `diagnostics`，机制与恢复说明见 [AUTO_UPDATE.md](AUTO_UPDATE.md)，验证边界见 [UPDATE_ACCEPTANCE.md](UPDATE_ACCEPTANCE.md)。
 
